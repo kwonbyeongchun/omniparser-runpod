@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # OmniParser v2 클론
-RUN git clone https://github.com/microsoft/OmniParser.git /app/OmniParser
+RUN git clone --branch v.2.0.0 --depth 1 https://github.com/microsoft/OmniParser.git /app/OmniParser
 
 # Python 의존성 설치
 COPY requirements.txt /app/requirements.txt
