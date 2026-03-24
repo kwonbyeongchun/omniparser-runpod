@@ -99,8 +99,9 @@ def handler(event):
         }
 
     except Exception as e:
-        traceback.print_exc()
-        return {"error": str(e)}
+        tb = traceback.format_exc()
+        print(f"Handler error: {tb}", flush=True)
+        return {"error": str(e), "traceback": tb}
 
 
 runpod.serverless.start({"handler": handler})
