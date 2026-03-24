@@ -44,10 +44,6 @@ def load_models():
         lang="korean",
         use_angle_cls=False,
         use_gpu=False,
-        show_log=False,
-        max_batch_size=1024,
-        use_dilation=True,
-        det_db_score_mode="slow",
     )
 
     print("All models loaded successfully.")

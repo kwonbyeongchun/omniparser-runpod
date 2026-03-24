@@ -29,7 +29,8 @@ snapshot_download('microsoft/OmniParser-v2.0', \
     mv /app/OmniParser/weights/icon_caption /app/OmniParser/weights/icon_caption_florence
 
 # PaddleOCR 한국어 모델 사전 다운로드 (cold start 시간 단축)
-RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(lang='korean', show_log=False)"
+ENV PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
+RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(lang='korean')"
 
 # 핸들러 복사
 COPY handler.py /app/handler.py
