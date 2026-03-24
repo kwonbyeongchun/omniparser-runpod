@@ -85,8 +85,11 @@ def handler(event):
         if parsed_content:
             for i, content in enumerate(parsed_content):
                 element = {"id": i, "content": content}
-                if label_coordinates and str(i) in label_coordinates:
-                    element["bbox"] = label_coordinates[str(i)]
+                if label_coordinates:
+                    if isinstance(label_coordinates, dict) and str(i) in label_coordinates:
+                        element["bbox"] = label_coordinates[str(i)]
+                    elif isinstance(label_coordinates, list) and i < len(label_coordinates):
+                        element["bbox"] = label_coordinates[i]
                 elements.append(element)
 
         return {
