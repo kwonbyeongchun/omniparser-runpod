@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 RUN pip install --no-cache-dir easyocr
 
 # 모델 가중치 다운로드 (OmniParser v2)
-RUN pip install --no-cache-dir --upgrade huggingface_hub && \
+RUN pip install --no-cache-dir "huggingface_hub>=0.23.2,<1.0" && \
     python -c "\
 from huggingface_hub import snapshot_download; \
 snapshot_download('microsoft/OmniParser-v2.0', \
