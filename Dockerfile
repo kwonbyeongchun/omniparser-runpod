@@ -9,8 +9,11 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# OmniParser v2 클론
-RUN git clone --branch v.2.0.0 --depth 1 https://github.com/microsoft/OmniParser.git /app/OmniParser
+# OmniParser v2 클론 (master)
+RUN git clone --depth 1 https://github.com/microsoft/OmniParser.git /app/OmniParser
+
+# OmniParser utils.py 패치 - filtered_boxes가 list of list일 경우 대응
+RUN sed -i "s/filtered_boxes_elem = sorted(filtered_boxes, key=lambda x: x\['content'\] is None)/filtered_boxes_elem = sorted(filtered_boxes, key=lambda x: x['content'] is None if isinstance(x, dict) else True)/" /app/OmniParser/util/utils.py
 
 # Python 의존성 설치
 COPY requirements.txt /app/requirements.txt
