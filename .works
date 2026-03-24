@@ -1,0 +1,85 @@
+# OmniParser v2 RunPod Serverless 배포 계획
+
+## 목표
+OmniParser v2를 RunPod Serverless 엔드포인트로 배포하여,
+스크린샷을 보내면 UI 요소 파싱 + 한국어/영어 OCR 결과를 반환하는 API 구축
+
+## 구성 파일
+
+```
+runpod/
+├── Dockerfile           # GPU 베이스 이미지 + OmniParser v2 설치
+├── handler.py           # RunPod Serverless 핸들러 (요청 처리)
+├── requirements.txt     # Python 의존성
+├── test_api.py          # RunPod 엔드포인트 테스트 스크립트
+└── CLAUDE.md            # 프로젝트 설정 메모
+```
+
+## 단계별 계획
+
+### Phase 1: 프로젝트 구조 준비
+- [ ] requirements.txt 작성 (torch, ultralytics, florence-2, paddleocr 등)
+- [ ] handler.py 작성 (runpod serverless 형식)
+- [ ] Dockerfile 작성 (CUDA 베이스 이미지)
+
+### Phase 2: OmniParser v2 핸들러 구현
+- [ ] OmniParser v2 모델 로딩 로직 (YOLOv8 + Florence-2)
+- [ ] PaddleOCR `lang="korean"` 설정
+- [ ] 입력: base64 이미지 → 출력: UI 요소 목록 + OCR 텍스트
+- [ ] handler.py에 runpod.serverless.start() 연결
+
+### Phase 3: Docker 이미지 빌드 & 배포 (클라우드에서 수행, 로컬 GPU 불필요)
+- [ ] GitHub repo에 push (GitHub 계정 사용)
+- [ ] GitHub Actions로 Docker 이미지 빌드 & GitHub Container Registry(ghcr.io)에 push
+- [ ] RunPod에서 Serverless Endpoint 생성 (ghcr.io 이미지 지정)
+
+### Phase 4: 테스트 & 검증 (RunPod 엔드포인트에서 직접 테스트)
+- [ ] test_api.py 작성 (RunPod API 호출 테스트 스크립트)
+- [ ] 기본 동작 테스트: 영어 UI 스크린샷으로 파싱 확인
+- [ ] 한국어 OCR 테스트: 홈택스 등 한국어 화면 스크린샷으로 인식 확인
+- [ ] 한영 혼합 테스트: 한국어 + 영어 혼합 화면 인식 확인
+- [ ] 응답 시간 측정 (cold start / warm 상태)
+- [ ] 에러 처리 테스트: 잘못된 이미지, 빈 입력 등
+
+## 제약 사항
+- 로컬 PC에 GPU 없음 → 로컬 테스트 불가
+- 코드 작성은 로컬, 빌드/실행은 모두 클라우드에서 수행
+
+## 기술 스택 상세
+
+### 베이스 이미지
+- `nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04` 또는 `runpod/pytorch:2.1.0-py3.10-cuda11.8.0`
+
+### 핵심 의존성
+- torch==2.1.0, torchvision==0.16.0 (CUDA 11.8)
+- ultralytics==8.3.70 (YOLOv8 아이콘 감지)
+- transformers (Florence-2 캡셔닝)
+- paddlepaddle-gpu, paddleocr (한국어 OCR)
+- supervision==0.18.0
+- runpod (serverless SDK)
+
+### 모델 가중치
+- HuggingFace: `microsoft/OmniParser-v2.0`
+- 다운로드 위치: `/app/weights/`
+
+### API 인터페이스
+```
+입력: { "image": "<base64 encoded screenshot>" }
+출력: {
+  "elements": [
+    {
+      "bbox": [x1, y1, x2, y2],
+      "type": "icon|text|button|...",
+      "caption": "설명",
+      "ocr_text": "인식된 텍스트"
+    },
+    ...
+  ]
+}
+```
+
+## 참고 자료
+- OmniParser GitHub: https://github.com/microsoft/OmniParser
+- RunPod Serverless 문서: https://docs.runpod.io/serverless/workers/custom-worker
+- RunPod Worker 템플릿: https://github.com/runpod-workers/worker-template
+- PaddleOCR 한국어: lang="korean"
