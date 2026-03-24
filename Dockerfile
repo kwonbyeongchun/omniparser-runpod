@@ -20,15 +20,12 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 RUN pip install --no-cache-dir easyocr
 
 # 모델 가중치 다운로드 (OmniParser v2)
-RUN pip install --no-cache-dir "huggingface_hub[cli]" && \
-    python -m huggingface_hub.commands.huggingface_cli download microsoft/OmniParser-v2.0 \
-        icon_detect/train_args.yaml \
-        icon_detect/model.pt \
-        icon_detect/model.yaml \
-        icon_caption/config.json \
-        icon_caption/generation_config.json \
-        icon_caption/model.safetensors \
-        --local-dir /app/OmniParser/weights && \
+RUN pip install --no-cache-dir --upgrade huggingface_hub && \
+    python -c "\
+from huggingface_hub import snapshot_download; \
+snapshot_download('microsoft/OmniParser-v2.0', \
+    allow_patterns=['icon_detect/*', 'icon_caption/*'], \
+    local_dir='/app/OmniParser/weights')" && \
     mv /app/OmniParser/weights/icon_caption /app/OmniParser/weights/icon_caption_florence
 
 # PaddleOCR 한국어 모델 사전 다운로드 (cold start 시간 단축)
