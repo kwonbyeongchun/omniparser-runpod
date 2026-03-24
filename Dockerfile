@@ -20,8 +20,8 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 RUN pip install --no-cache-dir easyocr
 
 # 모델 가중치 다운로드 (OmniParser v2)
-RUN pip install --no-cache-dir huggingface_hub && \
-    huggingface-cli download microsoft/OmniParser-v2.0 \
+RUN pip install --no-cache-dir "huggingface_hub[cli]" && \
+    python -m huggingface_hub.commands.huggingface_cli download microsoft/OmniParser-v2.0 \
         icon_detect/train_args.yaml \
         icon_detect/model.pt \
         icon_detect/model.yaml \
