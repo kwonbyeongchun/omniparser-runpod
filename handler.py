@@ -44,9 +44,13 @@ def load_models():
         lang="korean",
         use_angle_cls=False,
         use_gpu=False,
+        show_log=False,
+        max_batch_size=1024,
+        use_dilation=True,
+        det_db_score_mode="slow",
     )
 
-    print("All models loaded successfully.")
+    print("All models loaded successfully.", flush=True)
 
 
 def handler(event):
@@ -142,7 +146,14 @@ def handler(event):
 
 
 # 모델 로딩 (컨테이너 시작 시 1회)
-load_models()
+try:
+    print("Starting model loading...", flush=True)
+    load_models()
+except Exception as e:
+    import traceback
+    print(f"FATAL: Model loading failed: {e}", flush=True)
+    traceback.print_exc()
+    raise
 
 # RunPod Serverless 시작
 runpod.serverless.start({"handler": handler})
