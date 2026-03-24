@@ -1,7 +1,7 @@
 torch
 torchvision
 supervision==0.18.0
-transformers
+transformers==4.46.3
 ultralytics==8.3.70
 numpy==1.26.4
 opencv-python-headless
