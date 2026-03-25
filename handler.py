@@ -107,7 +107,6 @@ def handle_detect(image_b64, box_threshold, iou_threshold):
             elements.append(element)
 
     return {
-        "labeled_image": labeled_img_b64,
         "elements": elements,
     }
 
@@ -154,7 +153,6 @@ def handle_full(image_b64, box_threshold, iou_threshold):
             elements.append(element)
 
     return {
-        "labeled_image": labeled_img_b64,
         "elements": elements,
         "ocr_text": text,
     }
