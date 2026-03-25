@@ -1,5 +1,6 @@
 """
 OmniParser utils.py 패치 스크립트
+- easyocr import → mock 교체 (PaddleOCR만 사용하므로 easyocr 불필요)
 - PaddleOCR 한국어로 변경
 - filtered_boxes list of list → dict 변환
 - ocr_bbox/ocr_text None guard
@@ -9,6 +10,19 @@ filepath = "/app/OmniParser/util/utils.py"
 
 with open(filepath, "r") as f:
     content = f.read()
+
+# Patch 0: easyocr import 및 reader 생성을 mock으로 교체
+old0 = "import easyocr"
+new0 = "# import easyocr  # PATCHED: removed (using PaddleOCR only)"
+if old0 in content:
+    content = content.replace(old0, new0)
+    print("Patch 0a applied: easyocr import removed")
+
+old0b = "reader = easyocr.Reader(['en'])"
+new0b = "reader = None  # PATCHED: easyocr reader removed"
+if old0b in content:
+    content = content.replace(old0b, new0b)
+    print("Patch 0b applied: easyocr reader removed")
 
 # Patch 1: PaddleOCR 한국어로 변경
 old1 = """paddle_ocr = PaddleOCR(
