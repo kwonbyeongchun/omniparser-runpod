@@ -12,9 +12,6 @@ RUN apt-get update && apt-get install -y \
 # OmniParser v2 클론 (master)
 RUN git clone --depth 1 https://github.com/microsoft/OmniParser.git /app/OmniParser
 
-# OmniParser utils.py 패치 - filtered_boxes가 list of list일 경우 대응
-RUN sed -i "s/filtered_boxes_elem = sorted(filtered_boxes, key=lambda x: x\['content'\] is None)/filtered_boxes_elem = sorted(filtered_boxes, key=lambda x: x['content'] is None if isinstance(x, dict) else True)/" /app/OmniParser/util/utils.py
-
 # Python 의존성 설치
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
@@ -33,6 +30,10 @@ snapshot_download('microsoft/OmniParser-v2.0', \
 
 # PaddleOCR 한국어 모델 사전 다운로드 (cold start 시간 단축)
 RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(lang='korean', use_angle_cls=False, use_gpu=False, show_log=False)"
+
+# OmniParser utils.py 패치
+COPY patch_utils.py /app/patch_utils.py
+RUN python /app/patch_utils.py
 
 # 핸들러 복사
 COPY handler.py /app/handler.py
