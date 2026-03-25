@@ -16,6 +16,9 @@ RUN git clone --depth 1 https://github.com/microsoft/OmniParser.git /app/OmniPar
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
+# PaddlePaddle GPU (CUDA 11.8)
+RUN pip install --no-cache-dir paddlepaddle-gpu==3.0.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+
 # OmniParser 자체 의존성 중 누락분 설치
 RUN pip install --no-cache-dir easyocr
 
@@ -29,7 +32,8 @@ snapshot_download('microsoft/OmniParser-v2.0', \
     mv /app/OmniParser/weights/icon_caption /app/OmniParser/weights/icon_caption_florence
 
 # PaddleOCR 한국어 모델 사전 다운로드 (cold start 시간 단축)
-RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(lang='korean', use_angle_cls=False, use_gpu=False, show_log=False)"
+ENV PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
+RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(lang='korean')"
 
 # OmniParser utils.py 패치
 COPY patch_utils.py /app/patch_utils.py
