@@ -25,7 +25,7 @@ old1 = """paddle_ocr = PaddleOCR(
 new1 = """paddle_ocr = PaddleOCR(
     lang='korean',
     use_angle_cls=False,
-    use_gpu=True,
+    use_gpu=False,
 )"""
 
 if old1 in content:
@@ -39,7 +39,7 @@ else:
         content = re.sub(pattern, """paddle_ocr = PaddleOCR(
     lang='korean',
     use_angle_cls=False,
-    use_gpu=True,
+    use_gpu=False,
 )""", content)
         print("Patch 1 applied (regex): PaddleOCR 3.x + GPU + korean")
     else:

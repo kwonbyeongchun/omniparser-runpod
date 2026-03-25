@@ -34,7 +34,7 @@ print("Florence-2 model loaded.", flush=True)
 paddle_ocr = PaddleOCR(
     lang="korean",
     use_angle_cls=False,
-    use_gpu=True,
+    use_gpu=False,
 )
 print("PaddleOCR loaded.", flush=True)
 print("All models ready.", flush=True)

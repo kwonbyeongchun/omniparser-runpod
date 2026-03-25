@@ -16,8 +16,8 @@ RUN git clone --depth 1 https://github.com/microsoft/OmniParser.git /app/OmniPar
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# PaddlePaddle GPU (CUDA 11.8)
-RUN pip install --no-cache-dir paddlepaddle-gpu -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+# PaddlePaddle CPU (PyTorch와 GPU 충돌 방지)
+RUN pip install --no-cache-dir paddlepaddle
 
 # OmniParser 자체 의존성 중 누락분 설치
 RUN pip install --no-cache-dir easyocr
