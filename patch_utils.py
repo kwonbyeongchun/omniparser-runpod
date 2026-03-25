@@ -1,7 +1,6 @@
 """
 OmniParser utils.py 패치 스크립트
-- PaddleOCR 3.x 호환 (2.x 전용 파라미터 제거)
-- PaddleOCR GPU 사용
+- PaddleOCR 한국어로 변경
 - filtered_boxes list of list → dict 변환
 - ocr_bbox/ocr_text None guard
 """
@@ -11,8 +10,7 @@ filepath = "/app/OmniParser/util/utils.py"
 with open(filepath, "r") as f:
     content = f.read()
 
-# Patch 1: PaddleOCR 초기화를 3.x 호환 + GPU로 변경
-# OmniParser의 module-level PaddleOCR 인스턴스
+# Patch 1: PaddleOCR 한국어로 변경
 old1 = """paddle_ocr = PaddleOCR(
     lang='en',
     use_angle_cls=False,
@@ -26,24 +24,17 @@ new1 = """paddle_ocr = PaddleOCR(
     lang='korean',
     use_angle_cls=False,
     use_gpu=False,
+    show_log=False,
+    max_batch_size=1024,
+    use_dilation=True,
+    det_db_score_mode='slow',
 )"""
 
 if old1 in content:
     content = content.replace(old1, new1)
-    print("Patch 1 applied: PaddleOCR 3.x + GPU + korean")
+    print("Patch 1 applied: PaddleOCR lang=korean")
 else:
-    # 다른 포맷일 수 있으므로 유연하게 매칭
-    import re
-    pattern = r"paddle_ocr\s*=\s*PaddleOCR\([^)]*show_log[^)]*\)"
-    if re.search(pattern, content):
-        content = re.sub(pattern, """paddle_ocr = PaddleOCR(
-    lang='korean',
-    use_angle_cls=False,
-    use_gpu=False,
-)""", content)
-        print("Patch 1 applied (regex): PaddleOCR 3.x + GPU + korean")
-    else:
-        print("WARNING: Patch 1 target not found")
+    print("WARNING: Patch 1 target not found")
 
 # Patch 2: filtered_boxes dict 변환
 old2 = "filtered_boxes = remove_overlap_new(boxes=xyxy_elem, iou_threshold=iou_threshold, ocr_bbox=ocr_bbox_elem)"

@@ -16,8 +16,8 @@ RUN git clone --depth 1 https://github.com/microsoft/OmniParser.git /app/OmniPar
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# PaddlePaddle CPU (PyTorch와 GPU 충돌 방지)
-RUN pip install --no-cache-dir paddlepaddle
+# PaddleOCR 한국어 모델 사전 다운로드 (cold start 시간 단축)
+RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(lang='korean', use_angle_cls=False, use_gpu=False, show_log=False)"
 
 # OmniParser 자체 의존성 중 누락분 설치
 RUN pip install --no-cache-dir easyocr
@@ -30,9 +30,6 @@ snapshot_download('microsoft/OmniParser-v2.0', \
     allow_patterns=['icon_detect/*', 'icon_caption/*'], \
     local_dir='/app/OmniParser/weights')" && \
     mv /app/OmniParser/weights/icon_caption /app/OmniParser/weights/icon_caption_florence
-
-# PaddleOCR 3.x + GPU: 모델은 런타임에 자동 다운로드 (빌드 시 GPU 없음)
-ENV PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
 
 # OmniParser utils.py 패치
 COPY patch_utils.py /app/patch_utils.py

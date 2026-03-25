@@ -35,6 +35,7 @@ paddle_ocr = PaddleOCR(
     lang="korean",
     use_angle_cls=False,
     use_gpu=False,
+    show_log=False,
 )
 print("PaddleOCR loaded.", flush=True)
 print("All models ready.", flush=True)
