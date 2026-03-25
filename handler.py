@@ -80,13 +80,16 @@ def handle_detect(image_b64, box_threshold, iou_threshold):
     temp_path = "/tmp/input_image.png"
     image.save(temp_path)
 
-    # SOM 라벨링 (YOLOv8 + Florence-2, OCR bbox 없이)
+    # OCR를 빈 결과로 대체하여 get_som_labeled_img 호출
+    ocr_bbox = []
+
     labeled_img_b64, label_coordinates, parsed_content = get_som_labeled_img(
         temp_path,
         model=yolo_model,
         BOX_TRESHOLD=box_threshold,
         output_coord_in_ratio=True,
-        ocr_bbox=[],
+        ocr_bbox=ocr_bbox,
+        ocr_text=[],
         iou_threshold=iou_threshold,
         caption_model_processor=caption_model_processor,
         use_local_semantics=True,
