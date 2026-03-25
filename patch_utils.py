@@ -28,13 +28,22 @@ new = """filtered_boxes = remove_overlap_new(boxes=xyxy_elem, iou_threshold=iou_
 
 if old in content:
     content = content.replace(old, new)
-    with open(filepath, "w") as f:
-        f.write(content)
-    print("Patch applied successfully.")
+    print("Patch 1 applied: filtered_boxes dict conversion")
 else:
-    print("WARNING: Could not find target code to patch. Searching for alternatives...")
-    # 대체 패턴 검색
-    if "remove_overlap_new" in content:
-        print("remove_overlap_new found but pattern mismatch. Manual review needed.")
-    else:
-        print("remove_overlap_new not found in utils.py")
+    print("WARNING: Patch 1 target not found")
+
+# Patch 2: ocr_text가 None일 때 빈 리스트로 대체
+old2 = "ocr_bbox_elem = [{'type': 'text', 'bbox':box, 'interactivity':False, 'content':txt, 'source': 'box_ocr_content_ocr'} for box, txt in zip(ocr_bbox, ocr_text) if int_box_area(box, w, h) > 0]"
+new2 = """ocr_bbox = ocr_bbox if ocr_bbox is not None else []
+    ocr_text = ocr_text if ocr_text is not None else []
+    ocr_bbox_elem = [{'type': 'text', 'bbox':box, 'interactivity':False, 'content':txt, 'source': 'box_ocr_content_ocr'} for box, txt in zip(ocr_bbox, ocr_text) if int_box_area(box, w, h) > 0]"""
+
+if old2 in content:
+    content = content.replace(old2, new2)
+    print("Patch 2 applied: ocr_bbox/ocr_text None guard")
+else:
+    print("WARNING: Patch 2 target not found")
+
+with open(filepath, "w") as f:
+    f.write(content)
+print("All patches done.")
