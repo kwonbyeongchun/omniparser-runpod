@@ -86,7 +86,7 @@ def handle_detect(image_b64, box_threshold, iou_threshold):
         model=yolo_model,
         BOX_TRESHOLD=box_threshold,
         output_coord_in_ratio=True,
-        ocr_bbox=None,
+        ocr_bbox=[],
         iou_threshold=iou_threshold,
         caption_model_processor=caption_model_processor,
         use_local_semantics=True,
