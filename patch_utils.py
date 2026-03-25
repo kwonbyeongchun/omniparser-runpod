@@ -11,6 +11,13 @@ filepath = "/app/OmniParser/util/utils.py"
 with open(filepath, "r") as f:
     content = f.read()
 
+# Patch 0-pre: openai import 제거 (설치되지 않은 패키지)
+old_openai = "from openai import AzureOpenAI"
+new_openai = "# from openai import AzureOpenAI  # PATCHED: removed (not installed)"
+if old_openai in content:
+    content = content.replace(old_openai, new_openai)
+    print("Patch 0-pre applied: openai import removed")
+
 # Patch 0: easyocr import 및 reader 생성을 mock으로 교체
 old0 = "import easyocr"
 new0 = "# import easyocr  # PATCHED: removed (using PaddleOCR only)"
