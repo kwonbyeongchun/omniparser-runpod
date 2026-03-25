@@ -72,6 +72,43 @@ def handle_ocr(image_b64):
     }
 
 
+def handle_detect(image_b64, box_threshold, iou_threshold):
+    """YOLO + Florence-2만 실행 (OCR 제외)"""
+    image_bytes = base64.b64decode(image_b64)
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+
+    temp_path = "/tmp/input_image.png"
+    image.save(temp_path)
+
+    # SOM 라벨링 (YOLOv8 + Florence-2, OCR bbox 없이)
+    labeled_img_b64, label_coordinates, parsed_content = get_som_labeled_img(
+        temp_path,
+        model=yolo_model,
+        BOX_TRESHOLD=box_threshold,
+        output_coord_in_ratio=True,
+        ocr_bbox=None,
+        iou_threshold=iou_threshold,
+        caption_model_processor=caption_model_processor,
+        use_local_semantics=True,
+    )
+
+    elements = []
+    if parsed_content:
+        for i, content in enumerate(parsed_content):
+            element = {"id": i, "content": content}
+            if label_coordinates:
+                if isinstance(label_coordinates, dict) and str(i) in label_coordinates:
+                    element["bbox"] = label_coordinates[str(i)]
+                elif isinstance(label_coordinates, list) and i < len(label_coordinates):
+                    element["bbox"] = label_coordinates[i]
+            elements.append(element)
+
+    return {
+        "labeled_image": labeled_img_b64,
+        "elements": elements,
+    }
+
+
 def handle_full(image_b64, box_threshold, iou_threshold):
     """전체 OmniParser 실행 (YOLO + Florence-2 + OCR)"""
     image_bytes = base64.b64decode(image_b64)
@@ -132,6 +169,10 @@ def handler(event):
     try:
         if mode == "ocr":
             return handle_ocr(image_b64)
+        elif mode == "detect":
+            box_threshold = job_input.get("box_threshold", 0.05)
+            iou_threshold = job_input.get("iou_threshold", 0.1)
+            return handle_detect(image_b64, box_threshold, iou_threshold)
         else:
             box_threshold = job_input.get("box_threshold", 0.05)
             iou_threshold = job_input.get("iou_threshold", 0.1)
