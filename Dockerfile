@@ -31,9 +31,8 @@ snapshot_download('microsoft/OmniParser-v2.0', \
     local_dir='/app/OmniParser/weights')" && \
     mv /app/OmniParser/weights/icon_caption /app/OmniParser/weights/icon_caption_florence
 
-# PaddleOCR 한국어 모델 사전 다운로드 (cold start 시간 단축)
+# PaddleOCR 3.x + GPU: 모델은 런타임에 자동 다운로드 (빌드 시 GPU 없음)
 ENV PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
-RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(lang='korean')"
 
 # OmniParser utils.py 패치
 COPY patch_utils.py /app/patch_utils.py
